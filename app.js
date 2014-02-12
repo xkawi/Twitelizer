@@ -23,6 +23,25 @@ classifier.train();
 console.log(classifier.classify('i am short silver'));
 console.log(classifier.classify('i am long copper'));*/
 
+
+/*var get_tweets = (function(c){
+	twit.get("statuses/user_timeline", { screen_name: 'smrtsg', count: c}, function(err, reply){
+		if (err){
+			console.log(err);
+		} else {
+			//console.log(typeof(reply));
+			console.log("success in retrieving tweets");
+			reply.forEach(function(tweet){
+				console.log(tweet.id, tweet.text);
+				that.push( {tweet['id']:tweet.text} );
+			});
+//			that.tweets = JSON.stringify(reply);
+}
+console.log(that, typeof(that));
+return that;
+});
+});*/
+
 var app = express();
 
 app.get('/', function(req, res){
