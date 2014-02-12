@@ -1,0 +1,11 @@
+{
+  "name": "twitelizer",
+  "description": "Twitelizer analysis your emotion based on your tweets",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.x",
+    "natural": "0.1.x",
+    "twit": "1.x"
+  }
+}
