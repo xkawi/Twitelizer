@@ -1,10 +1,14 @@
 {
-  "name": "twitelizer",
-  "description": "Twitelizer analysis your emotion based on your tweets",
+  "name": "Twitelizer",
   "version": "0.0.1",
+  "description": "Twitelizer analyse your emotion based on your tweets",
   "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "express": "3.x",
+    "jade": "*",
     "natural": "0.1.x",
     "twit": "1.x",
     "firebase": "1.x.x"

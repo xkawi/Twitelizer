@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1 Twitelizer
+  p Welcome to Twitelizer. This is a RESTful backend server built using expressJS. Client can be viewed <a href="http://twitelizer-fe.kawi.me" target="_blank">here</a>
+  h2 Available APIs
+  ul
+    li
+      h3 GET /classify/:screen_name
+      p retrieves and classify all the tweets of a public profile
+      p :screen_name => refers to the twitter handle of a public profile. (NOTE: private account is not allowed)
+      p.
+        Example of Return Result (JSON):
+        {"status": "success",
+        "message": {"neutral": 100,"negative": 100,"positive": 100},
+        "fileurl": "http://localhost/results/screen_name.csv"}
+    li
+      h3 GET /analyse/:screen_name
+      p analyse the classification result for generating a line graph (NOTE: must perform classification first before analyse)
+      p :screen_name => refers to the twitter handle of a public profile. (NOTE: private account is not allowed)
+      p.
+        Example of Return Result (JSON):
+        {"status": "success",
+        "message": {
+        "20120101" : {"neutral": 2, "positive": 1, "negative": 3},
+        "20120102" : {"neutral": 4, "positive": 5, "negative": 6}
+        },"fileurl": "http://localhost/results/screen_name.tsv"}

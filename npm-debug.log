@@ -1,0 +1,72 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/kawi/.nvm/v0.10.24/bin/node',
+1 verbose cli   '/Users/kawi/.nvm/v0.10.24/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'cors' ]
+2 info using npm@1.3.21
+3 info using node@v0.10.24
+4 verbose readDependencies using package.json deps
+5 verbose cache add [ 'cors@2.1.1', null ]
+6 verbose cache add name=undefined spec="cors@2.1.1" args=["cors@2.1.1",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'cors@2.1.1',
+7 verbose parsed url   path: 'cors@2.1.1',
+7 verbose parsed url   href: 'cors@2.1.1' }
+8 verbose cache add name="cors" spec="2.1.1" args=["cors","2.1.1"]
+9 verbose parsed url { protocol: null,
+9 verbose parsed url   slashes: null,
+9 verbose parsed url   auth: null,
+9 verbose parsed url   host: null,
+9 verbose parsed url   port: null,
+9 verbose parsed url   hostname: null,
+9 verbose parsed url   hash: null,
+9 verbose parsed url   search: null,
+9 verbose parsed url   query: null,
+9 verbose parsed url   pathname: '2.1.1',
+9 verbose parsed url   path: '2.1.1',
+9 verbose parsed url   href: '2.1.1' }
+10 verbose addNamed [ 'cors', '2.1.1' ]
+11 verbose addNamed [ '2.1.1', '2.1.1' ]
+12 silly lockFile ad011d6d-cors-2-1-1 cors@2.1.1
+13 verbose lock cors@2.1.1 /Users/kawi/.npm/ad011d6d-cors-2-1-1.lock
+14 verbose url raw cors/2.1.1
+15 verbose url resolving [ 'https://registry.npmjs.org/', './cors/2.1.1' ]
+16 verbose url resolved https://registry.npmjs.org/cors/2.1.1
+17 info trying registry request attempt 1 at 13:06:40
+18 http GET https://registry.npmjs.org/cors/2.1.1
+19 info retry will retry, error on last attempt: Error: SELF_SIGNED_CERT_IN_CHAIN
+20 info trying registry request attempt 2 at 13:06:50
+21 http GET https://registry.npmjs.org/cors/2.1.1
+22 info retry will retry, error on last attempt: Error: SELF_SIGNED_CERT_IN_CHAIN
+23 info trying registry request attempt 3 at 13:07:50
+24 http GET https://registry.npmjs.org/cors/2.1.1
+25 silly lockFile ad011d6d-cors-2-1-1 cors@2.1.1
+26 silly lockFile ad011d6d-cors-2-1-1 cors@2.1.1
+27 error Error: SELF_SIGNED_CERT_IN_CHAIN
+27 error     at SecurePair.<anonymous> (tls.js:1370:32)
+27 error     at SecurePair.EventEmitter.emit (events.js:92:17)
+27 error     at SecurePair.maybeInitFinished (tls.js:982:10)
+27 error     at CleartextStream.read [as _read] (tls.js:469:13)
+27 error     at CleartextStream.Readable.read (_stream_readable.js:320:10)
+27 error     at EncryptedStream.write [as _write] (tls.js:366:25)
+27 error     at doWrite (_stream_writable.js:221:10)
+27 error     at writeOrBuffer (_stream_writable.js:211:5)
+27 error     at EncryptedStream.Writable.write (_stream_writable.js:180:11)
+27 error     at write (_stream_readable.js:583:24)
+28 error If you need help, you may report this *entire* log,
+28 error including the npm and node versions, at:
+28 error     <http://github.com/isaacs/npm/issues>
+29 error System Darwin 13.1.0
+30 error command "/Users/kawi/.nvm/v0.10.24/bin/node" "/Users/kawi/.nvm/v0.10.24/bin/npm" "install" "cors"
+31 error cwd /Users/kawi/dev/Twitelizer
+32 error node -v v0.10.24
+33 error npm -v 1.3.21
+34 verbose exit [ 1, true ]

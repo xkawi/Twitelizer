@@ -1,11 +1,12 @@
 var fs = require('fs');
+var http = require('http');
 var path = require('path');
 var express = require('express');
+var routes = require('./routes');
 var Twit = require('twit');
 var Firebase = require('firebase');
 var natural = require('natural'),
-	tokenizer = new natural.WordTokenizer();
-
+tokenizer = new natural.WordTokenizer();
 natural.PorterStemmer.attach();
 
 var twit = new Twit({
@@ -16,6 +17,31 @@ var twit = new Twit({
 });
 
 var app = express();
+
+// all environments
+app.set('port', process.env.PORT || 3000);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(express.methodOverride());
+app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
+
+// development only
+if ('development' == app.get('env')) {
+	app.use(express.errorHandler());
+}
+
+app.all('/*', function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	next();
+});
+
+app.get('/', routes.index);
 
 function get_limits(callback){
 	twit.get("application/rate_limit_status", { resources: "statuses" }, function(err, reply){
@@ -34,7 +60,7 @@ function save_result_csv(scrname, result){
 	positive,100
 	negative,200
 	*/
-	var file_name = "results/" + scrname + ".csv";
+	var file_name = "public/results/" + scrname + ".csv";
 	var wstream = fs.createWriteStream(file_name, {encoding: 'utf-8', mode: 438, flag: 'a'});
 	wstream.on('finish', function(){
 		console.log("please check ", file_name);		
@@ -63,13 +89,13 @@ date	negative	neutral	positive
 20101127	0	4	6
 20101128	2	9	6
 20101129	1	2	8
-	*/
-	var file_name = "results/" + scrname + ".tsv";
+*/
+var file_name = "public/results/" + scrname + ".tsv";
 
-	var wstream = fs.createWriteStream(file_name, {encoding: 'utf-8', mode: 438, flag: 'a'});
-	wstream.on('finish', function(){
-		console.log("please check ", file_name);		
-	});
+var wstream = fs.createWriteStream(file_name, {encoding: 'utf-8', mode: 438, flag: 'a'});
+wstream.on('finish', function(){
+	console.log("please check ", file_name);		
+});
 
 	//call function to create .tsv file for line graph
 	var header = "date\tnegative\tneutral\tpositive";
@@ -100,9 +126,15 @@ function getUserTimelines(user, done) {
 		twit.get('statuses/user_timeline', args, onTimeline);
 
 		function onTimeline(err, chunk) {
+			console.log(err, chunk);
 			if (err) {
 				console.log('Twitter search failed!');
 				return done(err);
+			}
+
+			if (chunk.length < 1){
+				console.log("No tweets is found");
+				return done(err, data);
 			}
 
 			if (data.length) chunk.shift(); // What is this for?
@@ -116,8 +148,8 @@ function getUserTimelines(user, done) {
 }
 
 
-var traindata_dir = "traindata";
-var classifier_file = "classifier.json";
+var traindata_dir = "public/traindata";
+var classifier_file = "public/classifier.json";
 
 app.get('/ratelimit', function(req, res){
 	get_limits(function(err, data){
@@ -197,21 +229,34 @@ app.get('/train/:cmd', function(req, res){
 				});
 			});
 		});
-		respond["status"] = "success";
-		respond["message"] = classifier_file + " file has been created in the root directory.";
-		res.send(respond);
-	} else {
-		respond["status"] = "error";
-		respond["message"] = "missing parameter /train/data?screen_name or /train/classifier";
-		res.send(respond);
-	}
+respond["status"] = "success";
+respond["message"] = classifier_file + " file has been created in the root directory.";
+res.send(respond);
+} else {
+	respond["status"] = "error";
+	respond["message"] = "missing parameter /train/data?screen_name or /train/classifier";
+	res.send(respond);
+}
 });
 
 app.get('/classify/:screen_name', function(req, res){
+	var hosturl = req.protocol + "://" + req.headers.host;
 	var scrname = (req.params.screen_name) ? req.params.screen_name : null;
+	var respond = { "status": "error", "message": "null"};
 	if (scrname) {
 		getUserTimelines(scrname, function(err, data){
-			if (err) throw err;
+			if (err){
+				respond.status = "error";
+				respond.message = err;
+				res.send(respond);
+			}
+
+			if (data.length < 1){
+				respond.status = "error";
+				respond.message = "username does not exist";
+				res.send(respond);
+			}
+
 			var result = { "neutral": 0, "negative": 0, "positive": 0};
 			natural.BayesClassifier.load('classifier.json', null, function(err, classifier) {
 				var fbase = new Firebase('https://twitelizer.firebaseio.com/' + scrname);
@@ -224,28 +269,25 @@ app.get('/classify/:screen_name', function(req, res){
 					//save to firebase
 					fbase.push({id: tweet.id, screen_name: scrname, date: tweet.created_at, text: clean_text, classification: classification_res});
 				});
-				console.log(result);
-
 				//save the data for creating the pie chart
 				save_result_csv(scrname, result);
-				var respond = {
-					"status": "success",
-					"message": result
-				}
+				respond.status = "success";
+				respond.message = result;
+				respond.fileurl = hosturl + "/results/" + scrname + ".csv";
 				res.send(respond);
 			});
 		});
-	} else {
-		var respond = {
-			"status": "error",
-			"message": "missing screen name: /classify/screen_name"
-		}
-		res.send(respond);
-	}
+} else {
+	respond.status = "error";
+	respond.message = "missing screen name: /classify/screen_name";
+	res.send(respond);
+}
 });
 
 app.get('/analyse/:screen_name', function(req, res){
+	var hosturl = req.protocol + "://" + req.headers.host;
 	var scrname = (req.params.screen_name) ? req.params.screen_name : null;
+	var respond = { "status": "error", "message": "null"};
 	if (scrname){
 		/*example:
 		var classified_tweets = {
@@ -256,32 +298,40 @@ app.get('/analyse/:screen_name', function(req, res){
 		var fbase = new Firebase("https://twitelizer.firebaseio.com/" + scrname);
 		//reference: https://www.firebase.com/docs/javascript/datasnapshot/index.html
 		fbase.once('value', function(allMessagesSnapshot) {
-	  		allMessagesSnapshot.forEach(function(messageSnapshot) {  			
-	    		var d = new Date(messageSnapshot.child('date').val());
-	    		var date = d.getFullYear().toString() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2)
-			
-	    		var classification = messageSnapshot.child('classification').val();
-	    		if (!classified_tweets[date]){
-	    			classified_tweets[date] = { "negative": 0, "neutral": 0, "positive" : 0 };
-	    		}
-	    		classified_tweets[date][classification] += 1;
-	  		});
 
-	  		save_result_tsv(scrname, classified_tweets);
-	  		var respond = {
-				"status": "success",
-				"message": classified_tweets
+			if (allMessagesSnapshot.numChildren() < 1){
+				respond.status = "error";
+				respond.message = "no tweets to analyse for screen name: " + scrname;
+				
+			} else {
+				allMessagesSnapshot.forEach(function(messageSnapshot) {  			
+					var d = new Date(messageSnapshot.child('date').val());
+					var date = d.getFullYear().toString() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2)
+					
+					var classification = messageSnapshot.child('classification').val();
+					if (!classified_tweets[date]){
+						classified_tweets[date] = { "negative": 0, "neutral": 0, "positive" : 0 };
+					}
+					classified_tweets[date][classification] += 1;
+				});
+
+				save_result_tsv(scrname, classified_tweets);
+				respond.status = "success";
+				respond.message = classified_tweets;
+				respond.fileurl = hosturl + "/results/" + scrname + ".tsv";
+						
 			}
+
 			res.send(respond);
+
 		});
 	} else {
-		var respond = {
-			"status": "error",
-			"message": "missing screen name: /analyse/screen_name"
-		}
+		respond.status = "error";
+		respond.message = "missing screen name: /analyse/screen_name";
 		res.send(respond);
 	}
 });
 
-app.listen(3000);
-console.log('Listening on port 3000');
+http.createServer(app).listen(app.get('port'), function(){
+	console.log('Express server listening on port ' + app.get('port'));
+});
