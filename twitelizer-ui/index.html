@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+	<title>Twitelizer</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<style type="text/css">
+	body {
+		padding-top: 50px;
+		text-align: left;
+		font: 1.5em sans-serif;
+	}
+	
+	.graph {
+		padding: 40px 15px;
+		text-align: left;
+	}
+
+	.graph-header {
+		text-align: left;
+	}
+
+	#pie-area {
+		position: relative;
+	}
+
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
+
+	.x.axis path {
+		display: none;
+	}
+
+	.line {
+		fill: none;
+		stroke: steelblue;
+		stroke-width: 1.5px;
+	}
+
+	.arc path {
+		stroke: #fff;
+	}
+
+	</style>
+</head>
+<body ng-app="app" ng-controller="AppCtrl as app">
+
+	<div class="modal js-loading-bar">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div id="progress-icon"><img src="img/loader.gif" /></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Twitelizer</a>
+			</div>
+			<div class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#">Home</a></li>
+					<li><a href="explain.html">Explanation</a></li>
+				</ul>
+				<!--<form class="navbar-form navbar-right" role="form">-->
+				<div class="navbar-right" style="margin-top: 8px">
+					<input type="text" ng-model="scrname" placeholder="screen name" style="width: 120px;height: 32px;" />
+					<button id="classify-btn" ng-click="classify(scrname)" class="btn btn-primary">Classify</button>
+					<button id="analyse-btn" ng-click="analyse(scrname)" class="btn btn-success">Analyse</button>
+				</div>
+			</div><!--/.nav-collapse -->
+		</div>
+	</div>
+
+
+	<div class="container">
+		<div class="row graph">
+			<div class="col-md-8 graph-header">
+				<div id="pie-area"></div>
+			</div>
+			<div class="col-md-4">
+				<h2>Information</h2>
+				<p>
+					Screen Name: <pre>{{input}}</pre>
+					Reply: <pre>{{result.status}}<br/>file_url: {{result.fileurl}}</pre>
+					Any Error: <pre>{{error}}</pre>
+				</p>
+				<h2>Instruction:</h2>
+					<ol>
+						<li>specify a valid and public twitter username to classify and generate a pie chart</li>
+						<li>specify the same username to analyse and generate line graph</li>
+					</ol>
+				
+			</div>
+		</div>
+		<hr />
+		<div class="row graph">
+			<div class="col-md-12 graph-header">
+				<div id="line-area"></div>
+			</div>
+		</div>
+	</div>
+
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/d3.v3.min.js"></script>
+	<script src="js/main.js"></script>
+
+</body>
+</html>
